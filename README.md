@@ -1,16 +1,16 @@
-# ExtractorImagen-Texto
+# Extractor de imagen a texto
 
 ## Descripción
 Una aplicación de escritorio desarrollada en Tkinter, usa la tecnología de reconocimiento óptico de caracteres y tiene soporte para múltiples formatos de imagen.
 
 ## Capturas de pantalla
-![Image1](https://github.com/user-attachments/assets/06424f0c-5082-46ba-8d0b-5040f4c67ab5)
+![image](https://github.com/user-attachments/assets/fe6f4cd9-2ae8-4b42-bb7e-136284f6c3f2)
 
-![Image2](https://github.com/user-attachments/assets/80abc613-bf6a-49a7-9e9b-6e6adb35cff9)
+![image](https://github.com/user-attachments/assets/77800690-f054-479b-9518-68c060af5a38)
 
-![Image3](https://github.com/user-attachments/assets/847d2db5-fec8-4e6d-894c-8799ba84aed4)
+![image](https://github.com/user-attachments/assets/d66d78a2-8eb4-4bb7-b937-190eeec15979)
 
-![Image4](https://github.com/user-attachments/assets/20f0c881-fa2e-43cd-bb9f-7bfb4da20b5f)
+![image](https://github.com/user-attachments/assets/4b663c19-99e1-472a-91e1-59ed753707a0)
 
 Resultado final
 
@@ -27,16 +27,15 @@ Resultado final
 
 ## Tecnologías utilizadas
 - Python 3.x
-- Tkinter
+- PyQt6
 - Easyocr
 
 ## Requerimientos
-- Python 3.x 
+- Python 3.x
+- PyQt6
 - Easyocr
-- Tkinterdnd2
 - Pillow
 - docx
-- python-docx
 
 ## Instalación desde CLI
 1. Clona el repositorio: 
@@ -54,4 +53,5 @@ python gui.py
 
 ## Estructura del proyecto:
 
-![estructura](https://github.com/user-attachments/assets/40d17cb3-aa74-4b18-9572-043b0a1fc9d1)
+![image](https://github.com/user-attachments/assets/5439e7ba-72c1-483a-bf7d-5d32b0409e9a)
+
