@@ -1,97 +1,317 @@
-import tkinter as tk
-from tkinter import messagebox, filedialog
-from tkinterdnd2 import DND_FILES, TkinterDnD
-from PIL import Image, ImageTk
+import sys
+import os
+from PyQt6.QtWidgets import (QApplication, QMainWindow, QLabel, QPushButton, 
+                            QVBoxLayout, QHBoxLayout, QWidget, QFileDialog, 
+                            QMessageBox, QProgressBar)
+from PyQt6.QtCore import Qt, QThread, pyqtSignal, QPropertyAnimation, QEasingCurve
+from PyQt6.QtGui import QPixmap, QDragEnterEvent, QDropEvent, QIcon
+from PIL import Image
 from imagen_texto import TextExtractorApp
 
-class GUI:
-    def __init__(self, root):
-        self.root = root
-        self.app_logic = TextExtractorApp() 
+class ExtractionWorker(QThread):
+    finished = pyqtSignal(list)
+    progress = pyqtSignal(int)
+    error = pyqtSignal(str)
+
+    def __init__(self, app_logic):
+        super().__init__()
+        self.app_logic = app_logic
+
+    def run(self):
+        try:
+            self.progress.emit(20)
+            result = self.app_logic.extract_text()
+            self.progress.emit(100)
+            self.finished.emit(result)
+        except Exception as e:
+            self.error.emit(str(e))
+
+class AnimatedButton(QPushButton):
+    def __init__(self, text, parent=None):
+        super().__init__(text, parent)
+        self.setObjectName("actionButton")
+        self._animation = QPropertyAnimation(self, b"geometry")
+        self._animation.setDuration(100)
+        self._animation.setEasingCurve(QEasingCurve.Type.OutQuad)
+
+    def enterEvent(self, event):
+        rect = self.geometry()
+        self._animation.setStartValue(rect)
+        self._animation.setEndValue(rect.adjusted(-2, -2, 2, 2))
+        self._animation.start()
+        super().enterEvent(event)
+
+    def leaveEvent(self, event):
+        rect = self.geometry()
+        self._animation.setStartValue(rect)
+        self._animation.setEndValue(rect.adjusted(2, 2, -2, -2))
+        self._animation.start()
+        super().leaveEvent(event)
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.app_logic = TextExtractorApp()
         self.setup_ui()
+        self.apply_styles()
+        self.setWindowIcon(QIcon('icon.png'))  
 
     def setup_ui(self):
-        self.root.title("Extractor de imagen a texto")
-        window_width = 600
-        window_height = 500
-        screen_width = self.root.winfo_screenwidth()
-        screen_height = self.root.winfo_screenheight()
-        x_cordinate = int((screen_width / 2) - (window_width / 2))
-        y_cordinate = int((screen_height / 2) - (window_height / 2))
-        self.root.geometry(f"{window_width}x{window_height}+{x_cordinate}+{y_cordinate}")
-        self.root.resizable(False, False)
-        
-        self.root.drop_target_register(DND_FILES)
-        self.root.dnd_bind('<<Drop>>', self.drop_image)
-        
-        self.container_frame = tk.Frame(self.root)
-        self.container_frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+        self.setWindowTitle("Extractor de imagen a texto")
+        self.setFixedSize(800, 600)
 
-        self.image_preview = tk.Label(self.container_frame)
-        self.image_preview.pack(pady=10)
+        # Widget central y layout principal
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        main_layout = QVBoxLayout(central_widget)
+        main_layout.setSpacing(20)
+        main_layout.setContentsMargins(30, 30, 30, 30)
 
-        self.label = tk.Label(self.container_frame, text="Arrastra una imagen aquí o haz clic en 'Cargar'", width=50, height=5)
-        self.label.pack(pady=10)
+        # Contenedor para la imagen
+        self.image_container = QWidget()
+        self.image_container.setObjectName("imageContainer")
+        image_layout = QVBoxLayout(self.image_container)
 
-        button_frame = tk.Frame(self.container_frame)
-        button_frame.pack(pady=5)
+        # Área de imagen
+        self.image_preview = QLabel()
+        self.image_preview.setFixedSize(720, 400)
+        self.image_preview.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.image_preview.setObjectName("imagePreview")
 
-        self.load_button = tk.Button(button_frame, text="Cargar", command=self.load_image)
-        self.load_button.pack(side=tk.LEFT, padx=5)
+        # Label de instrucciones
+        self.instruction_label = QLabel("Arrastra una imagen aquí o haz clic en 'Cargar'")
+        self.instruction_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.instruction_label.setObjectName("instructionLabel")
 
-        self.save_button = tk.Button(button_frame, text="Guardar", command=self.save_file, state=tk.DISABLED)
-        self.save_button.pack(side=tk.LEFT, padx=5)
+        image_layout.addWidget(self.image_preview, alignment=Qt.AlignmentFlag.AlignCenter)
+        image_layout.addWidget(self.instruction_label)
 
-        self.open_button = tk.Button(button_frame, text="Abrir", command=self.open_document, state=tk.DISABLED)
-        self.open_button.pack(side=tk.LEFT, padx=5)
+        # Barra de progreso
+        self.progress_bar = QProgressBar()
+        self.progress_bar.setObjectName("progressBar")
+        self.progress_bar.hide()
 
-    #Permite arrastra y soltar la imagen dentro de la aplicación
-    def drop_image(self, event):
-        self.app_logic.set_image_path(event.data.strip('{}'))
-        if self.app_logic.image_path:
+        # Contenedor de botones
+        button_container = QWidget()
+        button_container.setObjectName("buttonContainer")
+        button_layout = QHBoxLayout(button_container)
+        button_layout.setSpacing(15)
+
+        # Botones animados
+        self.load_button = AnimatedButton("Cargar")
+        self.save_button = AnimatedButton("Guardar")
+        self.open_button = AnimatedButton("Abrir")
+
+        for button in [self.load_button, self.save_button, self.open_button]:
+            button_layout.addWidget(button)
+
+        self.save_button.setEnabled(False)
+        self.open_button.setEnabled(False)
+
+        # Agregar widgets al layout principal
+        main_layout.addWidget(self.image_container)
+        main_layout.addWidget(self.progress_bar)
+        main_layout.addWidget(button_container)
+
+        # Conectar señales
+        self.load_button.clicked.connect(self.load_image)
+        self.save_button.clicked.connect(self.save_file)
+        self.open_button.clicked.connect(self.open_document)
+
+        # Configurar drag and drop
+        self.setAcceptDrops(True)
+
+    def apply_styles(self):
+        # Estilo moderno con tema claro
+        self.setStyleSheet("""
+            QMainWindow {
+                background-color: #FFFFFF;
+            }
+            
+            QWidget {
+                color: #333333;
+                font-family: 'Segoe UI', Arial, sans-serif;
+            }            
+            
+            #imageContainer {
+                background-color: #F5F7FA;
+                border-radius: 10px;
+                padding: 20px;
+                border: 1px solid #E1E5EA;
+            }
+            
+            #imagePreview {
+                background-color: #FFFFFF;
+                border: 2px dashed #C0C6CC;
+                border-radius: 5px;
+            }
+            
+            #imagePreview:hover {
+                border-color: #007AFF;
+            }
+            
+            #instructionLabel {
+                color: #6B7280;
+                font-size: 14px;
+                padding: 10px;
+            }
+            
+            #buttonContainer {
+                background-color: transparent;
+            }
+            
+            #actionButton {
+                background-color: #007AFF;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                font-size: 14px;
+                min-width: 100px;
+                font-weight: 500;
+            }
+            
+            #actionButton:hover {
+                background-color: #0056B3;
+            }
+            
+            #actionButton:disabled {
+                background-color: #E1E5EA;
+                color: #9CA3AF;
+            }
+            
+            QProgressBar {
+                border: none;
+                border-radius: 5px;
+                text-align: center;
+                background-color: #F5F7FA;
+                height: 20px;
+                color: #333333;
+            }
+            
+            QProgressBar::chunk {
+                background-color: #007AFF;
+                border-radius: 5px;
+            }
+            
+            QMessageBox {
+                background-color: #FFFFFF;
+            }
+            
+            QMessageBox QLabel {
+                color: #333333;
+            }
+            
+            QMessageBox QPushButton {
+                background-color: #007AFF;
+                color: white;
+                border: none;
+                padding: 5px 15px;
+                border-radius: 3px;
+            }
+            
+            QMessageBox QPushButton:hover {
+                background-color: #0056B3;
+            }
+        """)
+
+    def dragEnterEvent(self, event: QDragEnterEvent):
+        if event.mimeData().hasUrls():
+            event.accept()
+        else:
+            event.ignore()
+
+    def dropEvent(self, event: QDropEvent):
+        files = [u.toLocalFile() for u in event.mimeData().urls()]
+        if files:
+            self.app_logic.set_image_path(files[0])
             self.show_image_preview()
             self.enable_save_button()
 
     def load_image(self):
-        image_path = filedialog.askopenfilename(filetypes=[("Imagenes", "*.jpg *.jpeg *.png *.bmp *.gif")])
-        self.app_logic.set_image_path(image_path)
-        if image_path:
+        file_name, _ = QFileDialog.getOpenFileName(
+            self,
+            "Seleccionar imagen",
+            "",
+            "Imágenes (*.jpg *.jpeg *.png *.bmp *.gif)"
+        )
+        if file_name:
+            self.app_logic.set_image_path(file_name)
             self.show_image_preview()
             self.enable_save_button()
 
-    #Vista previa de la imgen
     def show_image_preview(self):
         try:
             image = Image.open(self.app_logic.image_path)
-            image.thumbnail((500, 430), Image.LANCZOS)
-            photo = ImageTk.PhotoImage(image)
-            self.image_preview.config(image=photo, width=500, height=430)
-            self.image_preview.image = photo
-            self.label.pack_forget()
+            image.thumbnail((720, 400))
+            image.save("temp.png")
+            pixmap = QPixmap("temp.png")
+            self.image_preview.setPixmap(pixmap)
+            self.instruction_label.hide()
         except Exception as e:
-            messagebox.showerror("Error", f"Error al cargar la imagen: {e}")
-    
-    #Habilita el boton cuando la imagen esta cargada
+            QMessageBox.critical(self, "Error", f"Error al cargar la imagen: {e}")
+
     def enable_save_button(self):
-        self.save_button.config(state=tk.NORMAL)
+        self.save_button.setEnabled(True)
 
     def save_file(self):
+        self.progress_bar.show()
+        self.progress_bar.setValue(0)
+        self.save_button.setEnabled(False)
+        
+        self.worker = ExtractionWorker(self.app_logic)
+        self.worker.progress.connect(self.update_progress)
+        self.worker.finished.connect(self.handle_extraction_finished)
+        self.worker.error.connect(self.handle_extraction_error)
+        self.worker.start()
+
+    def update_progress(self, value):
+        self.progress_bar.setValue(value)
+
+    def handle_extraction_finished(self, result):
         try:
-            result = self.app_logic.extract_text()
-            save_path = self.app_logic.save_text_to_docx(result)
+            save_path = self.app_logic.save_text_to_docx(result, self)
             if save_path:
-                messagebox.showinfo("Guardado", f"Texto extraído guardado en: {save_path}")
-                self.open_button.config(state=tk.NORMAL)
+                self.progress_bar.setValue(100)
+                QMessageBox.information(self, "Guardado", 
+                                      f"Texto extraído guardado en: {save_path}")
+                self.open_button.setEnabled(True)
         except Exception as e:
-            messagebox.showerror("Error", str(e))
+            QMessageBox.critical(self, "Error", str(e))
+        finally:
+            self.save_button.setEnabled(True)
+            self.progress_bar.hide()
+
+    def handle_extraction_error(self, error_message):
+        QMessageBox.critical(self, "Error", error_message)
+        self.save_button.setEnabled(True)
+        self.progress_bar.hide()
 
     def open_document(self):
         try:
             self.app_logic.open_document()
         except Exception as e:
-            messagebox.showerror("Error", f"No se pudo abrir el documento: {e}")
+            QMessageBox.critical(self, "Error", 
+                               f"No se pudo abrir el documento: {e}")
+
+    def closeEvent(self, event):
+        # Limpieza al cerrar la aplicación
+        if os.path.exists("temp.png"):
+            try:
+                os.remove("temp.png")
+            except:
+                pass
+        event.accept()
 
 if __name__ == "__main__":
-    root = TkinterDnD.Tk()
-    gui = GUI(root)
-    root.mainloop()
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    
+    # Centrar la ventana en la pantalla
+    screen = app.primaryScreen().geometry()
+    x = (screen.width() - window.width()) // 2
+    y = (screen.height() - window.height()) // 2
+    window.move(x, y)
+    
+    window.show()
+    sys.exit(app.exec())
