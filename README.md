@@ -1,7 +1,7 @@
 # Extractor de imagen a texto
 
 ## Descripción
-Una aplicación de escritorio desarrollada en Tkinter, usa la tecnología de reconocimiento óptico de caracteres y tiene soporte para múltiples formatos de imagen.
+Una aplicación de escritorio desarrollada con PyQt6, usa la tecnología de reconocimiento óptico de caracteres y tiene soporte para múltiples formatos de imagen.
 
 ## Capturas de pantalla
 ![image](https://github.com/user-attachments/assets/fe6f4cd9-2ae8-4b42-bb7e-136284f6c3f2)
