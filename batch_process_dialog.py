@@ -5,6 +5,8 @@ from PyQt6.QtCore import Qt, QThread, pyqtSignal
 from PyQt6.QtGui import QFont
 from config import ConfigManager
 import os
+import subprocess
+import sys
 from pathlib import Path
 
 class BatchProcessThread(QThread):
@@ -26,6 +28,7 @@ class BatchProcessThread(QThread):
         total = len(self.image_paths)
         
         for idx, image_path in enumerate(self.image_paths):
+            result_path = None
             try:
                 self.status.emit(f"Procesando {idx + 1}/{total}: {os.path.basename(image_path)}")
                 
@@ -37,11 +40,17 @@ class BatchProcessThread(QThread):
                 
                 # Guardar en el formato especificado
                 base_name = Path(image_path).stem
-                output_dir = os.path.expanduser("~/Documents")
+                
+                # Obtener la carpeta de Documentos de forma robusta
+                documents_path = Path.home() / "Documents"
+                output_dir = str(documents_path)
+                
+                # Crear directorio si no existe
+                os.makedirs(output_dir, exist_ok=True)
                 
                 if self.export_format == "docx":
                     output_path = os.path.join(output_dir, f"{base_name}.docx")
-                    result_path = self.app_logic.save_text_to_docx(text)
+                    result_path = self.app_logic.save_text_to_docx(text, output_path)
                 elif self.export_format == "txt":
                     output_path = os.path.join(output_dir, f"{base_name}.txt")
                     result_path = self.app_logic.save_text_to_txt(text, output_path)
@@ -51,19 +60,24 @@ class BatchProcessThread(QThread):
                 elif self.export_format == "rtf":
                     output_path = os.path.join(output_dir, f"{base_name}.rtf")
                     result_path = self.app_logic.save_text_to_rtf(text, output_path)
+                else:
+                    raise ValueError(f"Formato no soportado: {self.export_format}")
                 
                 if result_path:
                     self.results.append({
                         'image': image_path,
                         'output': result_path,
-                        'characters': len(''.join(text))
+                        'characters': len(''.join(text) if isinstance(text, list) else text)
                     })
-                
-                progress_value = int((idx + 1) / total * 100)
-                self.progress.emit(progress_value)
+                else:
+                    self.error.emit(f"No se pudo guardar: {os.path.basename(image_path)}")
                 
             except Exception as e:
                 self.error.emit(f"Error procesando {os.path.basename(image_path)}: {str(e)}")
+            finally:
+                # Siempre actualizar progreso, incluso si hay error
+                progress_value = int((idx + 1) / total * 100)
+                self.progress.emit(progress_value)
         
         self.finished.emit(self.results)
 
@@ -321,18 +335,38 @@ class BatchProcessDialog(QDialog):
         self.process_btn.setEnabled(True)
         
         if results:
+            # Obtener la ruta de Documentos para mostrar en el mensaje
+            documents_path = str(Path.home() / "Documents")
+            
             message = f"Procesamiento completado:\n\n"
             message += f"Archivos procesados: {len(results)}\n"
             total_chars = sum(r['characters'] for r in results)
             message += f"Total de caracteres: {total_chars:,}\n\n"
-            message += "Archivos guardados en Documentos"
+            message += f"Ubicación: {documents_path}"
             
-            QMessageBox.information(self, "Éxito", message)
+            reply = QMessageBox.information(self, "Éxito", message, 
+                                           QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Open)
+            
+            # Si el usuario hace clic en Abrir, abre la carpeta de Documentos
+            if reply == QMessageBox.StandardButton.Open:
+                self.open_documents_folder(documents_path)
         else:
             QMessageBox.warning(self, "Error", "No se procesó ningún archivo")
         
         self.progress_bar.hide()
         self.status_label.setText("Listo para procesar")
+    
+    def open_documents_folder(self, path):
+        """Abre la carpeta de Documentos en el explorador"""
+        try:
+            if sys.platform == "win32":
+                os.startfile(path)
+            elif sys.platform == "darwin":  # macOS
+                subprocess.Popen(["open", path])
+            else:  # Linux
+                subprocess.Popen(["xdg-open", path])
+        except Exception as e:
+            QMessageBox.warning(self, "Error", f"No se pudo abrir la carpeta: {str(e)}")
     
     def batch_error(self, error_message):
         """Maneja errores durante el procesamiento"""

@@ -2,10 +2,21 @@
     "theme": "dark",
     "default_export_format": "docx",
     "save_directory": "C:\\Users\\esteb\\Documents",
-    "recent_files": [],
+    "recent_files": [
+        {
+            "path": "D:/Esteban/Pictures/Prompt.png",
+            "timestamp": "2026-02-06T17:50:12.307370",
+            "characters": 341
+        },
+        {
+            "path": "clipboard_image.png",
+            "timestamp": "2026-02-06T16:34:32.955508",
+            "characters": 78
+        }
+    ],
     "statistics": {
-        "total_characters": 1015,
-        "files_processed": 3,
-        "total_processing_time": 7.059951305389404
+        "total_characters": 3480,
+        "files_processed": 11,
+        "total_processing_time": 31.523141384124756
     }
 }

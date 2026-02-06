@@ -75,7 +75,7 @@ class TextExtractorApp:
             SecurityLogger.log_extraction(self.image_path, False, 0)
             raise Exception(f"Error al procesar la imagen: {str(e)}")
 
-    def save_text_to_docx(self, text, parent_widget=None):
+    def save_text_to_docx(self, text, file_path=None, parent_widget=None):
         """Guarda el texto extraído en un archivo Word"""
         try:
             # Validar texto antes de exportar (OWASP A03)
@@ -89,34 +89,38 @@ class TextExtractorApp:
             for paragraph in text:
                 doc.add_paragraph(paragraph)
             
-            # Diálogo de guardar archivo usando PyQt6
-            self.save_path, _ = QFileDialog.getSaveFileName(
-                parent=parent_widget,
-                caption="Guardar como",
-                directory=os.path.expanduser("~/Documents"),
-                filter="Documento Word (*.docx)"
-            )
+            # Si no se proporciona una ruta, abrir diálogo
+            if not file_path:
+                from pathlib import Path
+                documents_path = str(Path.home() / "Documents")
+                file_path, _ = QFileDialog.getSaveFileName(
+                    parent=parent_widget,
+                    caption="Guardar como",
+                    directory=documents_path,
+                    filter="Documento Word (*.docx)"
+                )
             
-            if self.save_path:
+            if file_path:
                 # Asegurar que el archivo termine en .docx
-                if not self.save_path.lower().endswith('.docx'):
-                    self.save_path += '.docx'
+                if not file_path.lower().endswith('.docx'):
+                    file_path += '.docx'
                 
                 # Validar ruta de exportación (OWASP A01, A05)
-                is_valid, error = SecurityValidator.validate_export_path(self.save_path, '.docx')
+                is_valid, error = SecurityValidator.validate_export_path(file_path, '.docx')
                 if not is_valid:
                     SecurityLogger.log_invalid_input('export_path', error)
                     raise ValueError(f"Ruta de exportación inválida: {error}")
                 
-                doc.save(self.save_path)
+                doc.save(file_path)
+                self.save_path = file_path
                 
                 # Registrar exportación exitosa (OWASP A09)
-                SecurityLogger.log_export(self.save_path, 'DOCX', True)
-                return self.save_path
+                SecurityLogger.log_export(file_path, 'DOCX', True)
+                return file_path
             return None
         except Exception as e:
             # Registrar error de exportación (OWASP A09)
-            SecurityLogger.log_export(self.save_path or 'unknown', 'DOCX', False)
+            SecurityLogger.log_export(file_path or 'unknown', 'DOCX', False)
             raise Exception(f"Error al guardar el documento: {str(e)}")
     
     def save_text_to_txt(self, text, file_path=None):
@@ -130,9 +134,11 @@ class TextExtractorApp:
                 raise ValueError(f"Texto no válido para exportar: {error}")
             
             if not file_path:
+                from pathlib import Path
+                documents_path = str(Path.home() / "Documents")
                 file_path, _ = QFileDialog.getSaveFileName(
                     caption="Guardar como TXT",
-                    directory=os.path.expanduser("~/Documents"),
+                    directory=documents_path,
                     filter="Archivo de texto (*.txt)"
                 )
             
@@ -177,9 +183,11 @@ class TextExtractorApp:
                 raise ValueError(f"Texto no válido para exportar: {error}")
             
             if not file_path:
+                from pathlib import Path
+                documents_path = str(Path.home() / "Documents")
                 file_path, _ = QFileDialog.getSaveFileName(
                     caption="Guardar como PDF",
-                    directory=os.path.expanduser("~/Documents"),
+                    directory=documents_path,
                     filter="Archivo PDF (*.pdf)"
                 )
             
@@ -229,9 +237,11 @@ class TextExtractorApp:
                 raise ValueError(f"Texto no válido para exportar: {error}")
             
             if not file_path:
+                from pathlib import Path
+                documents_path = str(Path.home() / "Documents")
                 file_path, _ = QFileDialog.getSaveFileName(
                     caption="Guardar como RTF",
-                    directory=os.path.expanduser("~/Documents"),
+                    directory=documents_path,
                     filter="Archivo RTF (*.rtf)"
                 )
             
@@ -276,7 +286,7 @@ class TextExtractorApp:
         format_type: 'docx', 'txt', 'pdf', 'rtf'
         """
         if format_type.lower() == 'docx':
-            return self.save_text_to_docx(text)
+            return self.save_text_to_docx(text, file_path)
         elif format_type.lower() == 'txt':
             return self.save_text_to_txt(text, file_path)
         elif format_type.lower() == 'pdf':

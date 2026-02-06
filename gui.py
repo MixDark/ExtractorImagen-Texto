@@ -3,7 +3,7 @@ import os
 import time
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QLabel, QPushButton, 
                             QVBoxLayout, QHBoxLayout, QWidget, QFileDialog, 
-                            QMessageBox, QProgressBar, QMenuBar, QMenu, QScrollArea, QDialog)
+                            QMessageBox, QProgressBar, QMenuBar, QMenu, QScrollArea, QDialog, QSizePolicy, QSpacerItem)
 from PyQt6.QtCore import Qt, QThread, pyqtSignal, QPropertyAnimation, QEasingCurve
 from PyQt6.QtGui import QPixmap, QDragEnterEvent, QDropEvent, QIcon, QKeySequence
 from PIL import Image
@@ -43,22 +43,12 @@ class AnimatedButton(QPushButton):
     def __init__(self, text, parent=None):
         super().__init__(text, parent)
         self.setObjectName("actionButton")
-        self._animation = QPropertyAnimation(self, b"geometry")
-        self._animation.setDuration(100)
-        self._animation.setEasingCurve(QEasingCurve.Type.OutQuad)
+        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)  # Deshabilitar focus ring
 
     def enterEvent(self, event):
-        rect = self.geometry()
-        self._animation.setStartValue(rect)
-        self._animation.setEndValue(rect.adjusted(-2, -2, 2, 2))
-        self._animation.start()
         super().enterEvent(event)
 
     def leaveEvent(self, event):
-        rect = self.geometry()
-        self._animation.setStartValue(rect)
-        self._animation.setEndValue(rect.adjusted(2, 2, -2, -2))
-        self._animation.start()
         super().leaveEvent(event)
 
 class MainWindow(QMainWindow):
@@ -119,6 +109,7 @@ class MainWindow(QMainWindow):
         self.instruction_label.setObjectName("instructionLabel")
 
         image_layout.addWidget(self.image_preview, alignment=Qt.AlignmentFlag.AlignCenter)
+        image_layout.addStretch()
         image_layout.addWidget(self.instruction_label)
 
         # Barra de progreso
@@ -129,108 +120,126 @@ class MainWindow(QMainWindow):
         # Contenedor de botones principales (primera fila)
         button_container1 = QWidget()
         button_container1.setObjectName("buttonContainer")
-        button_container1.setMaximumHeight(36)
+        button_container1.setMaximumHeight(50)
         button_layout1 = QHBoxLayout(button_container1)
-        button_layout1.setSpacing(20)
-        button_layout1.setContentsMargins(0, 0, 0, 0)
+        button_layout1.setSpacing(15)
+        button_layout1.setContentsMargins(0, 5, 0, 5)
         button_layout1.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         # Botones animados principales con tooltips
         self.load_button = AnimatedButton("📂 Cargar")
-        self.load_button.setMinimumHeight(36)
-        self.load_button.setMaximumHeight(36)
-        self.load_button.setMinimumWidth(80)
-        self.load_button.setMaximumWidth(80)
+        self.load_button.setMinimumHeight(40)
+        self.load_button.setMaximumHeight(40)
+        self.load_button.setMinimumWidth(100)
+        self.load_button.setMaximumWidth(100)
+        self.load_button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.load_button.setToolTip("Cargar imagen desde archivo (Ctrl+O)")
         
         self.camera_button = AnimatedButton("📷 Cámara")
-        self.camera_button.setMinimumHeight(36)
-        self.camera_button.setMaximumHeight(36)
-        self.camera_button.setMinimumWidth(80)
-        self.camera_button.setMaximumWidth(80)
+        self.camera_button.setMinimumHeight(40)
+        self.camera_button.setMaximumHeight(40)
+        self.camera_button.setMinimumWidth(100)
+        self.camera_button.setMaximumWidth(100)
+        self.camera_button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.camera_button.setToolTip("Capturar imagen desde cámara web")
         
         self.paste_button = AnimatedButton("📋 Pegar")
-        self.paste_button.setMinimumHeight(36)
-        self.paste_button.setMaximumHeight(36)
-        self.paste_button.setMinimumWidth(80)
-        self.paste_button.setMaximumWidth(80)
+        self.paste_button.setMinimumHeight(40)
+        self.paste_button.setMaximumHeight(40)
+        self.paste_button.setMinimumWidth(100)
+        self.paste_button.setMaximumWidth(100)
+        self.paste_button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.paste_button.setToolTip("Pegar imagen desde portapapeles")
         
         self.extract_button = AnimatedButton("⭐ Extraer")
-        self.extract_button.setMinimumHeight(36)
-        self.extract_button.setMaximumHeight(36)
-        self.extract_button.setMinimumWidth(80)
-        self.extract_button.setMaximumWidth(80)
+        self.extract_button.setMinimumHeight(40)
+        self.extract_button.setMaximumHeight(40)
+        self.extract_button.setMinimumWidth(100)
+        self.extract_button.setMaximumWidth(100)
+        self.extract_button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.extract_button.setToolTip("Extraer texto de la imagen (Ctrl+S)")
         
         self.edit_button = AnimatedButton("✏️ Editar")
-        self.edit_button.setMinimumHeight(36)
-        self.edit_button.setMaximumHeight(36)
-        self.edit_button.setMinimumWidth(80)
-        self.edit_button.setMaximumWidth(80)
+        self.edit_button.setMinimumHeight(40)
+        self.edit_button.setMaximumHeight(40)
+        self.edit_button.setMinimumWidth(100)
+        self.edit_button.setMaximumWidth(100)
+        self.edit_button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.edit_button.setToolTip("Editar el texto extraído")
         
         self.copy_button = AnimatedButton("📋 Copiar")
-        self.copy_button.setMinimumHeight(36)
-        self.copy_button.setMaximumHeight(36)
-        self.copy_button.setMinimumWidth(80)
-        self.copy_button.setMaximumWidth(80)
+        self.copy_button.setMinimumHeight(40)
+        self.copy_button.setMaximumHeight(40)
+        self.copy_button.setMinimumWidth(100)
+        self.copy_button.setMaximumWidth(100)
+        self.copy_button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.copy_button.setToolTip("Copiar texto al portapapeles (Ctrl+C)")
 
         button_layout1.addStretch()
         for button in [self.load_button, self.camera_button, self.paste_button, self.extract_button, self.edit_button, self.copy_button]:
             button_layout1.addWidget(button)
+        
         button_layout1.addStretch()
 
         # Contenedor de botones secundarios (segunda fila)
         button_container2 = QWidget()
         button_container2.setObjectName("buttonContainer")
-        button_container2.setMaximumHeight(36)
+        button_container2.setMaximumHeight(50)
         button_layout2 = QHBoxLayout(button_container2)
-        button_layout2.setSpacing(20)
-        button_layout2.setContentsMargins(0, 0, 0, 0)
+        button_layout2.setSpacing(15)
+        button_layout2.setContentsMargins(0, 5, 0, 5)
         button_layout2.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         # Botones adicionales con tooltips
         self.open_button = AnimatedButton("📄 Abrir")
-        self.open_button.setMinimumHeight(36)
-        self.open_button.setMaximumHeight(36)
-        self.open_button.setMinimumWidth(80)
-        self.open_button.setMaximumWidth(80)
+        self.open_button.setMinimumHeight(40)
+        self.open_button.setMaximumHeight(40)
+        self.open_button.setMinimumWidth(100)
+        self.open_button.setMaximumWidth(100)
+        self.open_button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.open_button.setToolTip("Abrir documento guardado")
         
         self.batch_button = AnimatedButton("📚 Lotes")
-        self.batch_button.setMinimumHeight(36)
-        self.batch_button.setMaximumHeight(36)
-        self.batch_button.setMinimumWidth(80)
-        self.batch_button.setMaximumWidth(80)
+        self.batch_button.setMinimumHeight(40)
+        self.batch_button.setMaximumHeight(40)
+        self.batch_button.setMinimumWidth(100)
+        self.batch_button.setMaximumWidth(100)
+        self.batch_button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.batch_button.setToolTip("Procesar múltiples imágenes")
         
         self.stats_button = AnimatedButton("📊 Estadísticas")
-        self.stats_button.setMinimumHeight(36)
-        self.stats_button.setMaximumHeight(36)
-        self.stats_button.setMinimumWidth(80)
-        self.stats_button.setMaximumWidth(80)
+        self.stats_button.setMinimumHeight(40)
+        self.stats_button.setMaximumHeight(40)
+        self.stats_button.setMinimumWidth(100)
+        self.stats_button.setMaximumWidth(100)
+        self.stats_button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.stats_button.setToolTip("Ver estadísticas y configuración")
         
         self.tools_button = AnimatedButton("🛠️ Herramientas")
-        self.tools_button.setMinimumHeight(36)
-        self.tools_button.setMaximumHeight(36)
-        self.tools_button.setMinimumWidth(80)
-        self.tools_button.setMaximumWidth(80)
+        self.tools_button.setMinimumHeight(40)
+        self.tools_button.setMaximumHeight(40)
+        self.tools_button.setMinimumWidth(120)
+        self.tools_button.setMaximumWidth(120)
+        self.tools_button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.tools_button.setToolTip("Editar brillo, contraste, rotación de imagen")
         
         self.search_button = AnimatedButton("🔍 Buscar")
-        self.search_button.setMinimumHeight(36)
-        self.search_button.setMaximumHeight(36)
-        self.search_button.setMinimumWidth(80)
-        self.search_button.setMaximumWidth(80)
+        self.search_button.setMinimumHeight(40)
+        self.search_button.setMaximumHeight(40)
+        self.search_button.setMinimumWidth(100)
+        self.search_button.setMaximumWidth(100)
+        self.search_button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.search_button.setToolTip("Buscar texto en el contenido extraído (Ctrl+F)")
 
         button_layout2.addStretch()
+        
+        # Agregar espaciador invisible para alineación con fila 1 (6 elementos total)
+        spacer = QSpacerItem(60, 40, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        button_layout2.addItem(spacer)
+        
         for button in [self.open_button, self.batch_button, self.stats_button, self.tools_button, self.search_button]:
             button_layout2.addWidget(button)
+        
         button_layout2.addStretch()
 
         

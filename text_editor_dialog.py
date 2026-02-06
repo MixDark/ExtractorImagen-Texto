@@ -50,8 +50,8 @@ class TextEditorDialog(QDialog):
                 selection-background-color: #00BFFF;
             }
             QPushButton {
-                background-color: #00BFFF;
-                color: #000000;
+                background-color: #4D4D4D;
+                color: #FFFFFF;
                 border: none;
                 padding: 6px 12px;
                 border-radius: 4px;
@@ -59,7 +59,7 @@ class TextEditorDialog(QDialog):
                 font-weight: bold;
             }
             QPushButton:hover {
-                background-color: #0099CC;
+                background-color: #5D5D5D;
             }
             """
         else:
@@ -93,15 +93,16 @@ class TextEditorDialog(QDialog):
                 selection-background-color: #007AFF;
             }
             QPushButton {
-                background-color: #007AFF;
-                color: white;
-                border: none;
+                background-color: #E1E5EA;
+                color: #333333;
+                border: 1px solid #D0D5DC;
                 padding: 6px 12px;
                 border-radius: 4px;
                 min-width: 80px;
             }
             QPushButton:hover {
-                background-color: #0056B3;
+                background-color: #D0D5DC;
+                border: 1px solid #B8BCC4;
             }
             """
         
@@ -159,7 +160,6 @@ class TextEditorDialog(QDialog):
         cancel_btn.clicked.connect(self.reject)
         
         save_btn = QPushButton("Guardar Cambios")
-        save_btn.setStyleSheet("background-color: #007AFF; color: white; padding: 5px; font-weight: bold;")
         save_btn.clicked.connect(self.accept_changes)
         
         buttons_layout.addWidget(clear_btn)

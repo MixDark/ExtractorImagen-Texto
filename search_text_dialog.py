@@ -44,15 +44,15 @@ class SearchTextDialog(QDialog):
                 color: #FFFFFF;
             }
             QPushButton {
-                background-color: #00BFFF;
-                color: #000000;
+                background-color: #4D4D4D;
+                color: #FFFFFF;
                 border: none;
                 padding: 6px 12px;
                 border-radius: 4px;
                 font-weight: bold;
             }
             QPushButton:hover {
-                background-color: #0099CC;
+                background-color: #5D5D5D;
             }
             QPushButton:disabled {
                 background-color: #3D3D3D;
@@ -81,17 +81,19 @@ class SearchTextDialog(QDialog):
                 color: #333333;
             }
             QPushButton {
-                background-color: #007AFF;
-                color: white;
-                border: none;
+                background-color: #E1E5EA;
+                color: #333333;
+                border: 1px solid #D0D5DC;
                 padding: 6px 12px;
                 border-radius: 4px;
             }
             QPushButton:hover {
-                background-color: #0056B3;
+                background-color: #D0D5DC;
+                border: 1px solid #B8BCC4;
             }
             QPushButton:disabled {
-                background-color: #E1E5EA;
+                background-color: #F5F7FA;
+                border: 1px solid #E1E5EA;
             }
             """
         

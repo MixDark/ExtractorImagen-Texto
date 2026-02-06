@@ -59,16 +59,17 @@ QMessageBox QLabel {
 }
 
 QMessageBox QPushButton {
-    background-color: #007AFF;
-    color: white;
-    border: none;
+    background-color: #E1E5EA;
+    color: #333333;
+    border: 1px solid #D0D5DC;
     padding: 5px 15px;
     border-radius: 3px;
     min-width: 60px;
 }
 
 QMessageBox QPushButton:hover {
-    background-color: #0056B3;
+    background-color: #D0D5DC;
+    border: 1px solid #B8BCC4;
 }
 
 QDialog {
@@ -141,23 +142,38 @@ QTabBar {
 }
             
 #actionButton {
-    background-color: #007AFF;
-    color: white;
-    border: none;
-    padding: 10px 20px;
+    background-color: #E1E5EA;
+    color: #333333;
+    border: 1px solid #D0D5DC;
+    padding: 0px 0px;
     border-radius: 5px;
     font-size: 14px;
     min-width: 100px;
+    min-height: 40px;
     font-weight: 500;
+    outline: none;
 }
             
 #actionButton:hover {
-    background-color: #0056B3;
+    background-color: #D0D5DC;
+    border: 1px solid #B8BCC4;
+}
+            
+#actionButton:pressed {
+    background-color: #D0D5DC;
+    border: 1px solid #B8BCC4;
+}
+            
+#actionButton:focus {
+    background-color: #E1E5EA;
+    border: 1px solid #D0D5DC;
+    outline: none;
 }
             
 #actionButton:disabled {
-    background-color: #E1E5EA;
-    color: #9CA3AF;
+    background-color: #F5F7FA;
+    color: #BDBFC8;
+    border: 1px solid #E1E5EA;
 }
             
 QProgressBar {
@@ -257,23 +273,26 @@ QSlider::handle:horizontal:hover {
 }
 
 QPushButton {
-    background-color: #007AFF;
-    color: white;
-    border: none;
+    background-color: #E1E5EA;
+    color: #333333;
+    border: 1px solid #D0D5DC;
     padding: 8px 16px;
     border-radius: 4px;
     font-weight: 500;
 }
 
 QPushButton:hover {
-    background-color: #0056B3;
+    background-color: #D0D5DC;
+    border: 1px solid #B8BCC4;
 }
 
 QPushButton:pressed {
-    background-color: #003D82;
+    background-color: #BDBFC8;
+    border: 1px solid #A0A5AE;
 }
 
 QPushButton:disabled {
-    background-color: #E1E5EA;
-    color: #9CA3AF;
+    background-color: #F5F7FA;
+    color: #BDBFC8;
+    border: 1px solid #E1E5EA;
 }
