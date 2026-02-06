@@ -63,15 +63,15 @@ class ImageToolsDialog(QDialog):
                 border: 1px solid #3D3D3D;
             }
             QPushButton {
-                background-color: #00BFFF;
-                color: #000000;
+                background-color: #3D3D3D;
+                color: #FFFFFF;
                 border: none;
                 padding: 6px 12px;
                 border-radius: 4px;
                 font-weight: bold;
             }
             QPushButton:hover {
-                background-color: #0099CC;
+                background-color: #4D4D4D;
             }
             """
         else:
@@ -114,14 +114,14 @@ class ImageToolsDialog(QDialog):
                 border: 1px solid #E1E5EA;
             }
             QPushButton {
-                background-color: #007AFF;
-                color: white;
+                background-color: #E0E0E0;
+                color: #333333;
                 border: none;
                 padding: 6px 12px;
                 border-radius: 4px;
             }
             QPushButton:hover {
-                background-color: #0056B3;
+                background-color: #D0D0D0;
             }
             """
         
@@ -153,13 +153,15 @@ class ImageToolsDialog(QDialog):
         buttons_layout = QHBoxLayout()
         
         reset_btn = QPushButton("Restaurar original")
+        reset_btn.setMinimumWidth(120)
         reset_btn.clicked.connect(self.reset_image)
         
         cancel_btn = QPushButton("Cancelar")
+        cancel_btn.setMinimumWidth(100)
         cancel_btn.clicked.connect(self.reject)
         
         apply_btn = QPushButton("✓ Aplicar cambios")
-        apply_btn.setStyleSheet("background-color: #007AFF; color: white; min-width: 100px; font-weight: bold;")
+        apply_btn.setMinimumWidth(130)
         apply_btn.clicked.connect(self.apply_changes)
         
         buttons_layout.addWidget(reset_btn)

@@ -71,15 +71,15 @@ class StatisticsDialog(QDialog):
                 selection-background-color: #00BFFF;
             }
             QPushButton {
-                background-color: #00BFFF;
-                color: #000000;
+                background-color: #3D3D3D;
+                color: #FFFFFF;
                 border: none;
                 padding: 6px 12px;
                 border-radius: 4px;
                 font-weight: bold;
             }
             QPushButton:hover {
-                background-color: #0099CC;
+                background-color: #4D4D4D;
             }
             """
         else:
@@ -131,15 +131,15 @@ class StatisticsDialog(QDialog):
                 selection-background-color: #007AFF;
             }
             QPushButton {
-                background-color: #007AFF;
-                color: white;
+                background-color: #E0E0E0;
+                color: #333333;
                 border: none;
                 padding: 6px 12px;
                 border-radius: 4px;
                 font-weight: bold;
             }
             QPushButton:hover {
-                background-color: #0056B3;
+                background-color: #D0D0D0;
             }
             """
         
@@ -169,6 +169,7 @@ class StatisticsDialog(QDialog):
         # Botones
         buttons_layout = QHBoxLayout()
         close_btn = QPushButton("Cerrar")
+        close_btn.setMinimumWidth(100)
         close_btn.clicked.connect(self.accept)
         buttons_layout.addStretch()
         buttons_layout.addWidget(close_btn)
@@ -206,7 +207,7 @@ class StatisticsDialog(QDialog):
         
         # Botón para limpiar
         clear_btn = QPushButton("Limpiar estadísticas")
-        clear_btn.setMaximumWidth(200)
+        clear_btn.setMinimumWidth(140)
         clear_btn.clicked.connect(self.clear_statistics)
         btn_layout = QHBoxLayout()
         btn_layout.addStretch()

@@ -2,18 +2,7 @@
     "theme": "dark",
     "default_export_format": "docx",
     "save_directory": "C:\\Users\\esteb\\Documents",
-    "recent_files": [
-        {
-            "path": "D:/Esteban/Pictures/Prompt.png",
-            "timestamp": "2026-02-05T18:49:32.774941",
-            "characters": 341
-        },
-        {
-            "path": "D:/Proyectos Python - GUI/ExtractorImagen-Texto/temp.png",
-            "timestamp": "2026-02-05T18:44:37.920877",
-            "characters": 333
-        }
-    ],
+    "recent_files": [],
     "statistics": {
         "total_characters": 1015,
         "files_processed": 3,

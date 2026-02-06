@@ -123,15 +123,15 @@ class BatchProcessDialog(QDialog):
                 selection-background-color: #00BFFF;
             }
             QPushButton {
-                background-color: #00BFFF;
-                color: #000000;
+                background-color: #3D3D3D;
+                color: #FFFFFF;
                 border: none;
                 padding: 6px 12px;
                 border-radius: 4px;
                 font-weight: bold;
             }
             QPushButton:hover {
-                background-color: #0099CC;
+                background-color: #4D4D4D;
             }
             """
         else:
@@ -172,14 +172,14 @@ class BatchProcessDialog(QDialog):
                 selection-background-color: #007AFF;
             }
             QPushButton {
-                background-color: #007AFF;
-                color: white;
+                background-color: #E0E0E0;
+                color: #333333;
                 border: none;
                 padding: 6px 12px;
                 border-radius: 4px;
             }
             QPushButton:hover {
-                background-color: #0056B3;
+                background-color: #D0D0D0;
             }
             """
         
@@ -222,19 +222,23 @@ class BatchProcessDialog(QDialog):
         buttons_layout = QHBoxLayout()
         
         add_btn = QPushButton("+ Agregar imágenes")
+        add_btn.setMinimumWidth(130)
         add_btn.clicked.connect(self.add_images)
         
         remove_btn = QPushButton("- Remover seleccionada")
+        remove_btn.setMinimumWidth(140)
         remove_btn.clicked.connect(self.remove_image)
         
         clear_btn = QPushButton("Limpiar lista")
+        clear_btn.setMinimumWidth(110)
         clear_btn.clicked.connect(self.clear_list)
         
         cancel_btn = QPushButton("Cancelar")
+        cancel_btn.setMinimumWidth(100)
         cancel_btn.clicked.connect(self.close)
         
         self.process_btn = QPushButton("▶ Procesar")
-        self.process_btn.setStyleSheet("background-color: #007AFF; color: white; padding: 8px; font-weight: bold;")
+        self.process_btn.setMinimumWidth(100)
         self.process_btn.clicked.connect(self.process_batch)
         
         buttons_layout.addWidget(add_btn)
